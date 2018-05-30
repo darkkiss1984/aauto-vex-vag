@@ -51,7 +51,7 @@ public class ExlapReader {
     public static final String EXLAP_VENDOR_CHANNEL_NAME = "com.vwag.infotainment.gal.exlap";
 
     private static final long CONNECTION_TIMEOUT_MS = 2000;
-    private static final long MEASUREMENTS_FLUSH_DELAY_MS = 500;
+    private static final long MEASUREMENTS_FLUSH_DELAY_MS = 1000;
 
     public static final int AUTH_TEST_TB = 0;
     public static final int AUTH_RSE_L = 1;
@@ -251,10 +251,11 @@ public class ExlapReader {
     private void onData(ByteBuffer message) {
         String xml = StandardCharsets.UTF_8.decode(message).toString();
 
-        if (mState != State.STATE_ACTIVE) {
-            // It's very noisy when active...
-            Log.d(TAG, "<- EXLAP: " + xml);
-        }
+//        if (mState != State.STATE_ACTIVE) {
+//            // It's very noisy when active...
+//            Log.d(TAG, "<- EXLAP: " + xml);
+//        }
+        logExlapXml(xml);
 
         for (DebugListener l: mDebugListeners) {
             try {
@@ -276,6 +277,16 @@ public class ExlapReader {
             throw new IllegalStateException("Reader already stopped");
         }
         mState = State.STATE_STOPPED;
+    }
+
+    private void logExlapXml(String message) {
+        int maxLogSize = 900;
+        for(int i = 0; i <= message.length() / maxLogSize; i++) {
+            int start = i * maxLogSize;
+            int end = (i+1) * maxLogSize;
+            end = end > message.length() ? message.length() : end;
+            Log.d(TAG, "<-EXLAP: " +  message.substring(start, end));
+        }
     }
 
     private void handleIncomingMessage(String xml) throws ParserConfigurationException,
@@ -436,7 +447,7 @@ public class ExlapReader {
                         mCurrentMeasurements = new HashMap<>();
                         mState = State.STATE_ACTIVE;
                         for (String url: mUrls) {
-                            sendRequest(String.format(Locale.ROOT, "<Subscribe url=\"%s\" timeStamp=\"true\"/>", url));
+                            sendRequest(String.format(Locale.ROOT, "<Subscribe url=\"%s\" ival=\"1000\" timeStamp=\"true\"/>", url));
                         }
                     }
                 }
