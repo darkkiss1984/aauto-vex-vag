@@ -29,11 +29,11 @@ public class ExlapCarStatsService extends Service implements ExlapReader.Listene
     private static final String TAG = "ExlapCarStatsService";
 
     private static final int[] SESSION_AUTHS = {
-            ExlapReader.AUTH_RSE_L,ExlapReader.AUTH_RSE_3,ExlapReader.AUTH_ML_74
+            ExlapReader.AUTH_RSE_3
     };
 
     private static final String[] SESSION_NAMES = {
-            "statsRSEL","statsRSE3","statsML74"
+            "stats",
     };
 
     private IExlapService mExlapSessionService;
